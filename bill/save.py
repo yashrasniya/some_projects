@@ -23,12 +23,12 @@ class SaveAs:
         car = tabel.cursor()
 
         for list in self.list:
-            print(type(list[0]), list[0].get(), list[1].get(), list[2].get(), list[3].get(), list[4].get())
+            print(type(list[0]), list[0], list[1], list[2], list[3], list[4])
             print()
-            car.execute('INSERT INTO bill(nameP,address,prodakt_name,qit,rate,totel) VALUES(?,?,?,?,?,?)',
-                        (list[0].get(), list[1].get(), list[2].get(),
-                         list[3].get(), list[4].get(),
-                         list[5].get()))  # inselting the data in sqlit3 data bass
+            car.execute('INSERT INTO bill(nameP,gst,size,Quantity,Rate) VALUES(?,?,?,?,?)',
+                        (list[0], list[1], list[2],
+                         list[3], list[4],
+                         ))  # inselting the data in sqlit3 data bass
         print("completed")
         tabel.commit()
         car.close()
@@ -41,7 +41,7 @@ class Show:
         print(self.file_name)
         car = tabel.cursor()
 
-        carpat = car.execute("SELECT nameP,address,prodakt_name,qit,rate,totel from bill")
+        carpat = car.execute("SELECT nameP,gst,size,Quantity,Rate from bill")
         # for fetchall all data
         self.valu = car.fetchall()
         print(self.valu)

@@ -4,7 +4,7 @@ from tkinter import filedialog
 
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QMainWindow, QLineEdit, QApplication, QAction, QMenu
+from PyQt5.QtWidgets import QMainWindow, QLineEdit, QApplication, QAction, QMenu ,QFileDialog
 import threading
 import save, pdfmacker
 
@@ -28,8 +28,8 @@ class my_cal(QMainWindow):
         self.top_entrys()
         self.Qlabel = QtWidgets.QLabel(self)
         self.Qlabel.setGeometry(500, 500, 200, 50)
-        b1=QtWidgets.QPushButton(self)
-        b1.clicked.connect(self.creating_pdf)
+        # b1=QtWidgets.QPushButton(self)
+        # b1.clicked.connect(self.creating_pdf)
 
 
     def donothing(self):
@@ -37,17 +37,29 @@ class my_cal(QMainWindow):
 
     def save_as(self):
         self.geting_all_values()
-        js = filedialog.asksaveasfilename()  # creating a dialogebox for name
+        fileName, _ = QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "",
+                                                  "All Files (*);;Text Files (*.txt)")  # creating a dialogebox for name
 
         save.SaveAs(self.geting_values_of_top_list,
-                         self.data_all_entry_list, js)
+                         self.data_all_entry_list, fileName)
 
     def open(self):
 
-        open_file = str(filedialog.askopenfile()).split("'")  # creating a dialogebox for file path
+        open_file = str(QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                                                  "All Files (*);;Python Files (*.py)")
+        ).split("'")  # creating a dialogebox for file path
+        for entrys_for_del in self.all_entry_list:
+            for entrys_for_del in entrys_for_del:
+                entrys_for_del.deleteLater()
+        for label in self.totle_list_label:
+            label.deleteLater()
+        self.totle_list_label.clear()
+        self.nos=0
         self.all_entry_list.clear()  # delete all data of list
         self.i.clear()  # delete all data of list
         self.i.append(1)  # add 1 for loop funtion
+        self.y.clear()
+        self.y.append(100)
         value = save.Show()
 
         value = value.show_tabel(open_file[1])
@@ -55,11 +67,14 @@ class my_cal(QMainWindow):
 
         print(value)
         for v in value:
-            self.entry("v")
+            self.entry()
             l = 0
             for j in v:
-                self.all_entry_list[num][l].insert(0, j)  # display all data in entry
-                l += 1
+                if j!=None:
+                    print(num,j)
+                    self.all_entry_list[num][l].setText(j)  # display all data in entry
+                    self.all_entry_list[num][l].show()
+                    l += 1
             num += 1
 
     def menu(self):
@@ -67,9 +82,13 @@ class my_cal(QMainWindow):
         fileMenu = menubar.addMenu('File')
         editMenu = menubar.addMenu('Edit')
 
-        impMenu = QMenu('Import', self)
-        impAct = QAction('Import mail', self)
-        impMenu.addAction(impAct)
+        save_menu = QAction('save',self)
+        open_menu = QAction('open',self)
+
+        save_menu.triggered.connect(lambda :self.save_as())
+        open_menu.triggered.connect(lambda :self.open())
+
+
         self.actionCopy = QtWidgets.QAction(self)
 
         copy = editMenu.addMenu("Copy")
@@ -82,7 +101,8 @@ class my_cal(QMainWindow):
         _translate = QtCore.QCoreApplication.translate
         self.actionCopy.setShortcut(_translate("MainWindow", "Ctrl+C"))
         fileMenu.addAction(newAct)
-        fileMenu.addMenu(impMenu)
+        fileMenu.addAction(save_menu)
+        fileMenu.addAction(open_menu)
         menubar.show()
 
         # menubar = Menu(root)
@@ -221,7 +241,7 @@ class my_cal(QMainWindow):
                 t = self.get_qut[a] * self.get_rate[a] * self.get_size[a] # multiply qui and rate
 
                 multiply.append((t,self.get_gst[a]))
-            nos = 0
+            self.nos = 0
             ks = 0
             with_gst_totel=0
             for nass ,gst in multiply:
@@ -231,12 +251,12 @@ class my_cal(QMainWindow):
                 with_gst_totel=(nass*gst)/100+with_gst_totel
 
 
-                self.totle_list_label[nos].setText(f"without gst:{nass} withgst:{(nass*gst)/100} Total:{pre} Total withgst:{with_gst_totel}")  # show the data as label
-                self.totle_list_label[nos].adjustSize()
-                self.totle_list_label[nos].show()
+                self.totle_list_label[self.nos].setText(f"without gst:{nass} withgst:{(nass*gst)/100} Total:{pre} Total withgst:{with_gst_totel}")  # show the data as label
+                self.totle_list_label[self.nos].adjustSize()
+                self.totle_list_label[self.nos].show()
                 ks=pre
-                nos += 1
-        except:
+                self.nos += 1
+        except TypeError:
             time = 5
             print("error")
             pass
